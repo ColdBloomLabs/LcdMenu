@@ -223,10 +223,8 @@ class ItemFooter : public MenuItem {
 
 #define MAIN_MENU(...)           \
     extern MenuItem* mainMenu[]; \
-    MenuItem* mainMenu[] = {new ItemHeader(), __VA_ARGS__, new ItemFooter()}
+    MenuItem* mainMenu[] = {new ItemHeader(), ##__VA_ARGS__, new ItemFooter()}
 
 #define SUB_MENU(subMenu, parent, ...)                          \
-    MenuItem* subMenu[] = {new ItemHeader(parent), __VA_ARGS__, \
-                           new ItemFooter()}
-
+    MenuItem* subMenu[] = {new ItemHeader(parent), ##__VA_ARGS__, new ItemFooter()}
 #endif

@@ -345,6 +345,16 @@ class LcdMenu {
      * ## Public Methods
      */
 
+    void attachMenuToLcd(LiquidCrystal* lcd, MenuItem** menu) {
+        this->lcd = lcd;
+        lcd->clear();
+        lcd->createChar(0, upArrow);
+        lcd->createChar(1, downArrow);
+        this->currentMenuTable = menu;
+        this->startTime = millis();
+        update();
+    }
+
     /**
      * Call this function in `setup()` to initialize the LCD and the custom
      * characters used as up and down arrows
@@ -360,7 +370,7 @@ class LcdMenu {
 #else
         uint8_t rs, uint8_t en, uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
         MenuItem** menu) {
-        this->lcd = new LiquidCrystal(rs, en, d0, d1, d2, d3);
+//        this->lcd = new LiquidCrystal(rs, en, d0, d1, d2, d3);
         this->lcd->begin(maxCols, maxRows);
 #endif
         lcd->clear();
