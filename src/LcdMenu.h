@@ -169,22 +169,31 @@ class LcdMenu {
      * Draw the menu items with up and down indicators
      */
     void drawMenu() {
+        Serial.println("T10");
         lcd->clear();
+        Serial.println("T20");
         //
         // print the menu items
         //
         for (uint8_t i = top; i <= bottom; i++) {
+            Serial.println("T30");
             MenuItem* item = currentMenuTable[i];
+            Serial.println("T40");
             lcd->setCursor(1, map(i, top, bottom, 0, maxRows - 1));
+            Serial.println("T50");
             if (currentMenuTable[i]->getType() != MENU_ITEM_END_OF_MENU) {
+                Serial.println("T60"); // This is where the back crash happens
                 lcd->print(item->getText());
+                Serial.println("T70");
             }
             //
             // determine the type of item
             //
+            Serial.println("T80");
             switch (item->getType()) {
 #ifdef ItemToggle_H
                 case MENU_ITEM_TOGGLE:
+                  Serial.println("T90");
                     //
                     // append textOn or textOff depending on the state
                     //
@@ -196,6 +205,8 @@ class LcdMenu {
 #if defined(ItemProgress_H) || defined(ItemInput_H)
                 case MENU_ITEM_INPUT:
                 case MENU_ITEM_PROGRESS:
+
+                  Serial.println("T100");
                     //
                     // append the value of the input
                     //
@@ -204,6 +215,7 @@ class LcdMenu {
                               maxCols - strlen(item->getText()) - 2, buf);
                     lcd->print(":");
                     lcd->print(buf);
+                    Serial.println("T110");
                     break;
 #endif
 #ifdef ItemList_H
@@ -211,27 +223,36 @@ class LcdMenu {
                     //
                     // append the value of the item at current list position
                     //
+                    Serial.println("T120");
+
                     lcd->print(":");
                     lcd->print(item->getItems()[item->getItemIndex()].substring(
                         0, maxCols - strlen(item->getText()) - 2));
+                    Serial.println("T130");
                     break;
 #endif
                 default:
+                  Serial.println("T140");
                     break;
             }
+
+            Serial.println("T150");
             // if we reached the end of menu, stop
             if (currentMenuTable[i]->getType() == MENU_ITEM_END_OF_MENU) break;
+            Serial.println("T160");
         }
         //
         // determine if cursor is at the top
         //
         if (top == 1) {
+          Serial.println("T170");
             //
             // Print the down arrow only
             //
             lcd->setCursor(maxCols - 1, maxRows - 1);
             lcd->write(byte(1));
         } else if (!isAtTheStart() && !isAtTheEnd()) {
+          Serial.println("T180");
             //
             // Print the down arrow
             //
@@ -246,9 +267,12 @@ class LcdMenu {
             //
             // Print the up arrow only
             //
+
+            Serial.println("T190");
             lcd->setCursor(maxCols - 1, 0);
             lcd->write(byte(0));
         }
+        Serial.println("T200");
     }
     /**
      * Check if the cursor is at the start of the menu items
@@ -272,12 +296,17 @@ class LcdMenu {
      * @param isHistoryAvailable indicates if there is a previous position
      */
     void reset(boolean isHistoryAvailable) {
+      Serial.println("Y10");
         if (isHistoryAvailable) {
-            cursorPosition = previousCursorPosition;
+          Serial.println("Y20");
+
+          cursorPosition = previousCursorPosition;
             top = previousTop;
             bottom = previousBottom;
         } else {
-            previousCursorPosition = cursorPosition;
+          Serial.println("Y30");
+
+          previousCursorPosition = cursorPosition;
             previousTop = top;
             previousBottom = bottom;
 
@@ -285,7 +314,11 @@ class LcdMenu {
             top = 1;
             bottom = maxRows;
         }
-        update();
+      Serial.println("Y40");
+
+      update();
+      Serial.println("Y50");
+
     }
 #ifdef ItemInput_H
     /**
@@ -396,19 +429,40 @@ class LcdMenu {
      * Draw the menu items and cursor
      */
     void update() {
-        if (!enableUpdate) return;
+        Serial.println("Z10");
+        if (!enableUpdate) {
+          Serial.println("Z20");
+          return;
+        }
+        Serial.println("Z30");
         lcd->display();
+        lcd->clear();
 #ifndef USE_STANDARD_LCD
+        Serial.println("Z40");
         lcd->setBacklight(backlightState);
 #endif
+        Serial.println("Z50");
         drawMenu();
+        Serial.println("Z60");
         drawCursor();
+        Serial.println("Z70");
         startTime = millis();
+        Serial.println("Z80");
     }
     /**
      * Reset the display
      */
     void resetMenu() { this->reset(false); }
+    /**
+     * Set the menu to the specified menu or submenu.
+     * Only makes the change if it wasn't already on this menu.
+     */
+    void overrideMenu(MenuItem** theMenu) {
+      if (currentMenuTable != theMenu) {
+        currentMenuTable = theMenu;
+        this->reset(false);
+      }
+    }
     /**
      * Execute an "up press" on menu
      * When edit mode is enabled, this action is skipped
@@ -558,6 +612,7 @@ class LcdMenu {
         // Log
         printCmd(F("BACK"));
         MenuItem* item = currentMenuTable[cursorPosition];
+        Serial.println("X");
         //
         // Back action different when on ItemInput
         //
@@ -591,9 +646,15 @@ class LcdMenu {
         //
         // check if this is a sub menu, if so go back to its parent
         //
+        Serial.println("X10");
         if (isSubMenu()) {
+          Serial.println("X20");
             currentMenuTable = currentMenuTable[0]->getSubMenu();
-            reset(true);
+          Serial.println("X30");
+
+          reset(true);
+          Serial.println("X40");
+
         }
     }
     /**
