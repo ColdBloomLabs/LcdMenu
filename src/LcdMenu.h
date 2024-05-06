@@ -410,6 +410,16 @@ class LcdMenu {
      */
     void resetMenu() { this->reset(false); }
     /**
+     * Set the menu to the specified menu or submenu.
+     * Only makes the change if it wasn't already on this menu.
+     */
+    void overrideMenu(MenuItem** theMenu) {
+      if (currentMenuTable != theMenu) {
+        currentMenuTable = theMenu;
+        this->reset(false);
+      }
+    }
+    /**
      * Execute an "up press" on menu
      * When edit mode is enabled, this action is skipped
      */
